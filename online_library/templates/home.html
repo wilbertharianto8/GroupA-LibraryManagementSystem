@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Online Library{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section with Search -->
+    <div class="row mb-5">
+        <div class="col-md-8 mx-auto text-center">
+            <h1 class="display-4 mb-4">Welcome to Online Library</h1>
+        </div>
+    </div>
+</div>
+
+<style>
+    .search-form {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .search-form .input-group {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .search-form input {
+        border-right: none;
+    }
+    .search-form button {
+        border-left: none;
+    }
+</style>
+{% endblock %} 
