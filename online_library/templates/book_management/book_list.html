@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Management - Online Library{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Book Management</h1>
+        <a href="{% url 'book_management:add_book' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Book
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>ISBN</th>
+                            <th>Type</th>
+                            <th>Location/File</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in books %}
+                            <tr>
+                                <td>{{ book.title }}</td>
+                                <td>{{ book.author }}</td>
+                                <td>{{ book.isbn }}</td>
+                                <td>
+                                    <span class="badge bg-{{ book.management.book_type|lower }}">
+                                        {{ book.management.book_type|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if book.management.book_type == 'physical' %}
+                                        <span class="badge bg-info">{{ book.management.location_code }}</span>
+                                    {% else %}
+                                        {% if book.management.file %}
+                                            <a href="{{ book.management.file.url }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">No file</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'book_management:edit_book' book.pk %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'book_management:delete_book' book.pk %}" 
+                                           class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">
+                                    No books found. <a href="{% url 'book_management:add_book' %}">Add a book</a> to get started.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

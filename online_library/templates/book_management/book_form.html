@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Online Library{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">{{ title }}</h2>
+                    
+                    {% if book_form and management_form %}
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <h4 class="mb-3">Book Information</h4>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Genres</h5>
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addGenreModal">
+                                    <i class="fas fa-plus"></i> Add New Genre
+                                </button>
+                            </div>
+                            {{ book_form|crispy }}
+                            
+                            <h4 class="mb-3 mt-4">Management Information</h4>
+                            {{ management_form|crispy }}
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary">Save Book</button>
+                                <a href="{% url 'book_management:book_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    {% else %}
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Genres</h5>
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addGenreModal">
+                                    <i class="fas fa-plus"></i> Add New Genre
+                                </button>
+                            </div>
+                            {{ form.book_form|crispy }}
+                            {{ form.management_form|crispy }}
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary">Save Book</button>
+                                <a href="{% url 'book_management:book_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Genre Modal -->
+<div class="modal fade" id="addGenreModal" tabindex="-1" aria-labelledby="addGenreModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addGenreModalLabel">Add New Genre</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addGenreForm" method="post" action="{% url 'books:genre_add_ajax' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="genreName" class="form-label">Genre Name</label>
+                        <input type="text" class="form-control" id="genreName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="genreDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="genreDescription" name="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="addGenreForm" class="btn btn-primary">Add Genre</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Refresh the page after adding a new genre
+    document.getElementById('addGenreForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Close the modal
+                var modal = bootstrap.Modal.getInstance(document.getElementById('addGenreModal'));
+                modal.hide();
+                
+                // Refresh the page to show the new genre
+                window.location.reload();
+            } else {
+                alert('Error adding genre: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while adding the genre.');
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 
