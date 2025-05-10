@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Online Library{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section with Search -->
+    <div class="row mb-5">
+        <div class="col-md-8 mx-auto text-center">
+            <h1 class="display-4 mb-4">Welcome to Online Library</h1>
+        </div>
+    </div>
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search for books..." autocomplete="off">
+        <div id="search-results" class="search-results"></div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+
+        searchInput.addEventListener('input', function () {
+            const query = this.value;
+            if (query.length > 0) {
+                fetch(`/search/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResults.innerHTML = '';
+                        data.forEach(book => {
+                            const highlightedTitle = book.title.replace(
+                                new RegExp(query, 'gi'),
+                                match => `<mark>${match}</mark>`
+                            );
+                            const resultItem = document.createElement('div');
+                            resultItem.classList.add('result-item');
+                            resultItem.innerHTML = `<strong>${highlightedTitle}</strong> by ${book.author}`;
+                            resultItem.addEventListener('click', () => {
+                                window.location.href = `/books/${book.id}/`;
+                            });
+                            searchResults.appendChild(resultItem);
+                        });
+                        searchResults.classList.add('show');
+                    });
+            } else {
+                searchResults.innerHTML = '';
+                searchResults.classList.remove('show');
+            }
+        });
+    </script>
+</div>
+
+<style>
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+        position: relative;
+    }
+
+    #search-input {
+        width: 50%;
+        padding: 10px 15px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 25px;
+        outline: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #search-input::placeholder {
+        color: #aaa;
+        font-style: italic;
+    }
+
+    #search-input:hover {
+        border-color: #007bff;
+        background: linear-gradient(90deg, #e3f2fd, #ffffff);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .search-results {
+        width: 50%;
+        max-height: 300px;
+        overflow-y: auto;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 10px;
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .search-results.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .result-item {
+        padding: 10px 15px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .result-item:last-child {
+        border-bottom: none;
+    }
+
+    .result-item:hover {
+        background: #f8f9fa;
+    }
+
+    mark {
+        background-color: #ffeb3b;
+        color: #000;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
