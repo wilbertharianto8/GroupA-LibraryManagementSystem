@@ -7,6 +7,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from books.models import Book
 from .models import BookManagement
 from .forms import CombinedBookForm, BookManagementForm, BookForm
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from books.models import Book
 
 class BookListView(ListView):
 # class BookListView(LoginRequiredMixin, ListView):
@@ -72,3 +76,5 @@ class BookDeleteView(DeleteView):
         response = super().delete(request, *args, **kwargs)
         messages.success(request, 'Book deleted successfully!')
         return response
+
+
