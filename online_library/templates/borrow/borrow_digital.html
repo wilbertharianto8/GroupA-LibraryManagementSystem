@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Borrow Digital Book{% endblock %}
+
+{% block content %}
+<h2>Borrow Digital Book</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ book.title }}</h5>
+        <p class="card-text">Author: {{ book.author }}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Confirm Borrow (14 Days)</button>
+            <a href="{% url 'borrow:book_detail' book.id %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

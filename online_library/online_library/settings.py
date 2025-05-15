@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'book_management.apps.BookManagementConfig',
     'books.apps.BooksConfig',
+    'borrow',
 ]
 
 MIDDLEWARE = [

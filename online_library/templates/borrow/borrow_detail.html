@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Borrow Detail{% endblock %}
+
+{% block content %}
+<h2>Borrow Detail</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ borrow.book.title }}</h5>
+        <p class="card-text">Borrow Type: {{ borrow.get_book_type_display }}</p>
+        <p class="card-text">Borrowed At: {{ borrow.borrowed_at }}</p>
+        <p class="card-text">Due Date: {{ borrow.due_date }}</p>
+        <p class="card-text">Returned At: {{ borrow.returned_at|default:"Not yet returned" }}</p>
+
+        {% if borrow.book_type == 'digital' and borrow.due_date > now and not borrow.returned_at %}
+            <a href="{% url 'borrow:download_digital_book' borrow.id %}" class="btn btn-success">Download Digital Copy</a>
+        {% endif %}
+    </div>
+</div>
+
+<a href="{% url 'book_management:book_list' %}" class="btn btn-secondary mt-3">Back to Book List</a>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Borrow Physical Book{% endblock %}
+
+{% block content %}
+<h2>Borrow Physical Book</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ book.title }}</h5>
+        <p class="card-text">Author: {{ book.author }}</p>
+        <p class="card-text">Available Copies: {{ book.available_copies }}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Borrow</button>
+            <a href="{% url 'borrow:book_detail' book.id %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
