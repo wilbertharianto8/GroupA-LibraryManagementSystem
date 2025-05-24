@@ -2,15 +2,24 @@
 {% block title %}Book Detail{% endblock %}
 
 {% block content %}
-<h2>Book Detail</h2>
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">{{ book.title }}</h5>
-        <p class="card-text">Author: {{ book.author }}</p>
-        <p class="card-text">Available Physical Copies: {{ book.available_copies }}</p>
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="bi bi-book"></i> Book Detail</h2>
 
-        <a href="{% url 'borrow:borrow_physical' book.id %}" class="btn btn-primary me-2">Borrow Physical</a>
-        <a href="{% url 'borrow:borrow_digital' book.id %}" class="btn btn-success">Borrow Digital</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title">{{ book.title }}</h4>
+            <p class="card-text"><strong>Author:</strong> {{ book.author }}</p>
+            <p class="card-text"><strong>Available Physical Copies:</strong> {{ book.available_copies }}</p>
+
+            <div class="d-flex mt-3">
+                <a href="{% url 'borrow:borrow_physical' book.id %}" class="btn btn-primary me-2">
+                    <i class="bi bi-box-arrow-down"></i> Borrow Physical
+                </a>
+                <a href="{% url 'borrow:borrow_digital' book.id %}" class="btn btn-success">
+                    <i class="bi bi-cloud-arrow-down"></i> Borrow Digital
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

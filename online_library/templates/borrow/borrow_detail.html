@@ -2,21 +2,56 @@
 {% block title %}Borrow Detail{% endblock %}
 
 {% block content %}
-<h2>Borrow Detail</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white text-center">
+                    <h3><i class="bi bi-journal-check me-2"></i>Borrow Detail</h3>
+                </div>
 
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">{{ borrow.book.title }}</h5>
-        <p class="card-text">Borrow Type: {{ borrow.get_book_type_display }}</p>
-        <p class="card-text">Borrowed At: {{ borrow.borrowed_at }}</p>
-        <p class="card-text">Due Date: {{ borrow.due_date }}</p>
-        <p class="card-text">Returned At: {{ borrow.returned_at|default:"Not yet returned" }}</p>
+                <div class="card-body">
+                    <h4 class="card-title mb-3">{{ borrow.book.title }}</h4>
 
-        {% if borrow.book_type == 'digital' and borrow.due_date > now and not borrow.returned_at %}
-            <a href="{% url 'borrow:download_digital_book' borrow.id %}" class="btn btn-success">Download Digital Copy</a>
-        {% endif %}
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Borrow Type:</strong> {{ borrow.get_book_type_display }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Borrowed At:</strong> {{ borrow.borrowed_at|date:"Y-m-d H:i" }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Due Date:</strong>
+                            <span class="{% if borrow.due_date < now and not borrow.returned_at %}text-danger{% else %}text-success{% endif %}">
+                                {{ borrow.due_date|date:"Y-m-d" }}
+                            </span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Returned At:</strong>
+                            {% if borrow.returned_at %}
+                                {{ borrow.returned_at|date:"Y-m-d H:i" }}
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Not yet returned</span>
+                            {% endif %}
+                        </li>
+                    </ul>
+
+                    {% if borrow.book_type == 'digital' and borrow.due_date > now and not borrow.returned_at %}
+                        <div class="d-grid mt-4">
+                            <a href="{% url 'borrow:download_digital_book' borrow.id %}" class="btn btn-success btn-lg">
+                                <i class="bi bi-download me-1"></i> Download Digital Copy
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-footer text-center">
+                    <a href="{% url 'book_management:book_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Book List
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-<a href="{% url 'book_management:book_list' %}" class="btn btn-secondary mt-3">Back to Book List</a>
 {% endblock %}
