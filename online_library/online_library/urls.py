@@ -25,4 +25,5 @@ urlpatterns = [
     path('home/',views.home,name='home'),
     path('search/', views.search_books, name='search_books'),
     path('borrow/', include('borrow.urls'), name='borrow'),
+    path('history/', include('history.urls'), name='history'),
 ]

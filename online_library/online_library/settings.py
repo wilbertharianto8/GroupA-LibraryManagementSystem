@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'book_management.apps.BookManagementConfig',
     'books.apps.BooksConfig',
     'borrow',
+    'history',
 ]
 
 MIDDLEWARE = [
