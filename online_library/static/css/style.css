@@ -1,0 +1,23 @@
+.navbar {
+    padding-top: 0.001rem;
+    padding-bottom: 0.001rem;
+}
+.navbar-brand {
+    display: flex;
+    gap: 12px;
+}
+.navbar-brand img {
+    height: 110px !important;
+    width: auto:
+}
+.navbar-nav .nav-link {
+    color: white;
+}
+.footer-links a {
+    color: #6c757d;
+    text-decoration: none;
+}
+.footer-links a:hover {
+    color: #343a40;
+    text-decoration: underline;
+}
