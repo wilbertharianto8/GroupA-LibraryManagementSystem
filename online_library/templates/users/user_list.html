@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Normal Users</h2>
+<ul>
+  {% for user in normal_users %}
+    <li>
+      {{ user.username }} - {{ user.email }}
+      <a href="{% url 'users:promote_user' user.id %}">Promote to Librarian</a>
+    </li>
+  {% empty %}
+    <li>No normal users found.</li>
+  {% endfor %}
+</ul>
+
+<h2>Librarians</h2>
+<ul>
+  {% for user in librarians %}
+    <li>
+      {{ user.username }} - {{ user.email }}
+      <a href="{% url 'users:demote_user' user.id %}">Demote to Normal User</a>
+    </li>
+  {% empty %}
+    <li>No librarians found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block subtitle %} Login {% endblock %}
+{% block extra_css %}
+<style>
+  .login-container {
+    max-width: 400px;
+    margin: 60px auto;
+    background: #fff;
+    padding: 40px 30px 50px;
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  input, textarea {
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1.8px solid #ccc;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    width: 100%;
+  }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: #764ba2;
+    box-shadow: 0 0 8px rgba(118,75,162,0.4);
+  }
+  button {
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+  button:hover {
+    background: linear-gradient(90deg, #5a3f9f 0%, #4c6ede 100%);
+    transform: scale(1.05);
+  }
+  button:active {
+    transform: scale(0.98);
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="login-container">
+    <h2 class="mb-4" style="color:#5a3f9f; text-align:center;">Welcome Back</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Log In</button>
+    </form>
+    <div style="margin-top: 12px; text-align: center;">
+        <a href="{% url 'users:password_reset' %}" style="color:#667eea; text-decoration: none; font-weight: 600;">
+            Forgot Password?
+        </a>
+    </div>
+</div>
+{% endblock %}

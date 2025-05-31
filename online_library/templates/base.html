@@ -31,15 +31,47 @@
 
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                          {% for group in user.groups.all %}
+                            {% if group.name == "Librarian" %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'book_management:book_list' %}">Book Management</a>
                     </li>
+                    <li class="nav-item">
+                              <!-- Show librarian-only content here -->
+                              <a class="nav-link" href="{% url 'users:user_list' %}">Admin Dashboard</a>
+                    </li>
+                                {% endif %}
+                            {% endfor %}
+                    {% endif %}
                 </ul>
-
-            </div>
+                <!-- Dropdown for user auth -->
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+              <!-- The logo or icon trigger -->
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                 data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user-circle fa-lg"></i> <!-- FontAwesome user icon -->
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                {% if user.is_authenticated %}
+                  <li><a class="dropdown-item" href="{% url 'users:profile' %}">Profile</a></li>
+                  <li>
+                    <form action="{% url 'users:logout' %}" method="post" style="display: inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item">Logout</button>
+                    </form>
+                  </li>
+                {% else %}
+                  <li><a class="dropdown-item" href="{% url 'users:login' %}">Login</a></li>
+                  <li><a class="dropdown-item" href="{% url 'users:register' %}">Register</a></li>
+                {% endif %}
+              </ul>
+            </li>
+          </ul>
         </div>
+      </div>
     </nav>
-
     <!-- Main Content -->
     <main class="container py-4">
         {% if messages %}
