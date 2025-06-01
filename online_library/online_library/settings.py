@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'book_management.apps.BookManagementConfig',
     'books.apps.BooksConfig',
     'borrow',
-    'history',
+    'borrow_history',
     'users.apps.UsersConfig',
 ]
 

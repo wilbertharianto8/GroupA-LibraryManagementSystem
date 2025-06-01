@@ -32,7 +32,7 @@
                     </div>
                     {% comment %} {% if user.is_authenticated %}
                         {% if book.available_copies > 0 %}
-                            <a href="{% url 'borrowing:request_borrowing' book.pk %}" class="btn btn-primary w-100">
+                            <a href="{% url 'borrow:borrow_physical' book.pk %}" class="btn btn-primary w-100">
                                 <i class="fas fa-book"></i> Borrow This Book
                             </a>
                         {% else %}

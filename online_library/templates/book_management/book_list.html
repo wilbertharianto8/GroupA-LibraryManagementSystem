@@ -17,6 +17,7 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Title</th>
                             <th>Author</th>
                             <th>ISBN</th>
@@ -33,9 +34,15 @@
                                 <td>{{ book.author }}</td>
                                 <td>{{ book.isbn }}</td>
                                 <td>
-                                    <span class="badge bg-{{ book.management.book_type|lower }}">
+                                    {% with book.management.book_type|lower as bt %}
+                                    <span class="badge
+                                        {% if bt == 'physical' %}bg-info
+                                        {% elif bt == 'digital' %}bg-success
+                                        {% else %}bg-secondary
+                                        {% endif %}">
                                         {{ book.management.book_type|title }}
                                     </span>
+                                    {% endwith %}
                                 </td>
                                 <td>
                                     {% if book.management.book_type == 'physical' %}

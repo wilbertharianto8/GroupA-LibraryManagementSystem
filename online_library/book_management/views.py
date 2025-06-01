@@ -19,7 +19,7 @@ class BookListView(ListView):
     context_object_name = 'books'
     
     def get_queryset(self):
-        return Book.objects.filter(management__isnull=False)
+        return Book.objects.filter(management__isnull=False).order_by('id')
 
 # @login_required
 def add_book(request):
