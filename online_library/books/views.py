@@ -56,7 +56,8 @@ class BookDetailView(DetailView):
         #     ).order_by('-request_date')
         return context
 
-class BookCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class BookCreateView(UserPassesTestMixin, CreateView):
+# class BookCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Book
     form_class = BookForm
     template_name = 'books/book_form.html'
@@ -69,7 +70,8 @@ class BookCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         messages.success(self.request, 'Book added successfully!')
         return super().form_valid(form)
 
-class BookUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class BookUpdateView(UserPassesTestMixin, UpdateView):
+# class BookUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Book
     form_class = BookForm
     template_name = 'books/book_form.html'
@@ -82,7 +84,8 @@ class BookUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         messages.success(self.request, 'Book updated successfully!')
         return super().form_valid(form)
 
-class BookDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class BookDeleteView(UserPassesTestMixin, DeleteView):
+# class BookDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Book
     template_name = 'books/book_confirm_delete.html'
     success_url = reverse_lazy('books:book_list')
@@ -95,7 +98,8 @@ class BookDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 # Genre management views
-class GenreListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class GenreListView(UserPassesTestMixin, ListView):
+# class GenreListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Genre
     template_name = 'books/genre_list.html'
     context_object_name = 'genres'
@@ -103,7 +107,8 @@ class GenreListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     def test_func(self):
         return self.request.user.is_administrator()
 
-class GenreCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class GenreCreateView(UserPassesTestMixin, CreateView):
+# class GenreCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Genre
     form_class = GenreForm
     template_name = 'books/genre_form.html'
@@ -116,7 +121,8 @@ class GenreCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         messages.success(self.request, 'Genre added successfully!')
         return super().form_valid(form)
 
-class GenreUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class GenreUpdateView(UserPassesTestMixin, UpdateView):
+# class GenreUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Genre
     form_class = GenreForm
     template_name = 'books/genre_form.html'
@@ -129,7 +135,8 @@ class GenreUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         messages.success(self.request, 'Genre updated successfully!')
         return super().form_valid(form)
 
-class GenreDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class GenreDeleteView(UserPassesTestMixin, DeleteView):
+# class GenreDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Genre
     template_name = 'books/genre_confirm_delete.html'
     success_url = reverse_lazy('books:genre_list')
@@ -141,7 +148,7 @@ class GenreDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         messages.success(request, 'Genre deleted successfully!')
         return super().delete(request, *args, **kwargs)
 
-@login_required
+# @login_required
 @require_POST
 def add_genre_ajax(request):
     name = request.POST.get('name')

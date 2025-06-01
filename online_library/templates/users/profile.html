@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-3">
+      <!-- Sidebar optional -->
+    </div>
+
+    <div class="col-md-9">
+      <h2>User Profile</h2>
+
+      <form method="POST" enctype="multipart/form-data" id="profile-form">
+        {% csrf_token %}
+        <div class="row g-4">
+
+          <!-- Left Column: Profile Picture -->
+          <div class="col-md-4 text-center">
+            {% if user.profile.profile_picture %}
+              <img src="{{ user.profile.profile_picture.url }}" class="img-fluid rounded mb-3" alt="Profile Picture" style="max-height: 250px;">
+            {% else %}
+              <img src="{% static 'default_profile.png' %}" class="img-fluid rounded mb-3" alt="Default Profile Picture" style="max-height: 250px;">
+            {% endif %}
+            <div class="mb-3">
+              <label for="id_profile_picture" id="upload-label" class="form-label btn btn-outline-primary w-100 disabled" style="display:none;">Upload Photo</label>
+              <input type="file" name="profile_picture" id="id_profile_picture" class="form-control d-none" disabled>
+            </div>
+          </div>
+
+          <!-- Right Column: Profile Information -->
+          <div class="col-md-8">
+            <h5>Profile Information</h5>
+
+            <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input type="text" class="form-control" value="{{ user.username }}" readonly>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Role</label>
+              <input type="text" class="form-control" value="{% if user.groups.first %}{{ user.groups.first.name }}{% else %}Normal User{% endif %}" readonly>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="id_first_name" class="form-label">First Name</label>
+                <input type="text" name="first_name" class="form-control" id="id_first_name" value="{{ user.first_name }}" readonly>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="id_last_name" class="form-label">Last Name</label>
+                <input type="text" name="last_name" class="form-control" id="id_last_name" value="{{ user.last_name }}" readonly>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="id_dob" class="form-label">Date of Birth</label>
+              <input type="date" name="dob" id="id_dob" class="form-control" value="{{ user.profile.dob }}" readonly>
+            </div>
+
+            <h5>Contact Info</h5>
+
+            <div class="mb-3">
+              <label for="id_email" class="form-label">Email (required)</label>
+              <input type="email" name="email" class="form-control" id="id_email" value="{{ user.email }}" required readonly>
+            </div>
+
+            <div class="mb-3">
+              <label for="id_phone_number" class="form-label">Phone Number</label>
+              <input type="text" name="phone_number" class="form-control" id="id_phone_number" value="{{ user.profile.phone_number }}" readonly>
+            </div>
+
+            <div class="mb-3">
+              <label for="id_address" class="form-label">Address</label>
+              <textarea name="address" id="id_address" class="form-control" rows="4" readonly>{{ user.profile.address }}</textarea>
+            </div>
+
+            <!-- Buttons -->
+            <button type="button" class="btn btn-primary" id="edit-btn">Edit Profile</button>
+            <button type="submit" name="profile_update" class="btn btn-success d-none" id="save-btn">Save Changes</button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const editBtn = document.getElementById('edit-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const form = document.getElementById('profile-form');
+
+    // Inputs and textareas to toggle read-only
+    const editableFields = [
+      'id_first_name', 'id_last_name', 'id_dob', 'id_email',
+      'id_phone_number', 'id_address', 'id_bio'
+    ];
+
+    editBtn.addEventListener('click', () => {
+      editableFields.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.removeAttribute('readonly');
+      });
+
+      // Show upload photo button and enable file input
+      const uploadLabel = document.getElementById('upload-label');
+      const fileInput = document.getElementById('id_profile_picture');
+      uploadLabel.style.display = 'block';
+      uploadLabel.classList.remove('disabled');
+      fileInput.disabled = false;
+
+      // Toggle buttons
+      editBtn.classList.add('d-none');
+      saveBtn.classList.remove('d-none');
+    });
+  });
+</script>
+
+{% endblock %}
