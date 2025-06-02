@@ -11,3 +11,17 @@ python manage.py dumpdata auth.User \
   --natural-primary \
   --natural-foreign \
   > fixtures/users.json
+
+# Export Books
+python manage.py dumpdata books.Book \
+  --indent=2 \
+  --natural-primary \
+  --natural-foreign \
+  > fixtures/books.json
+
+# Export Genres
+python manage.py dumpdata books.Genre \
+  --indent=2 \
+  --natural-primary \
+  --natural-foreign \
+  > fixtures/genre.json
