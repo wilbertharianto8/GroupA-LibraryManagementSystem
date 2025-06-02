@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Books - Online Library{% endblock %}
 
@@ -53,16 +54,23 @@
             <div class="col">
                 <div class="card h-100 shadow">
                     {% if book.cover_image %}
-                        <img src="{{ book.cover_image.url }}" class="card-img-top" alt="{{ book.title }}">
+                        <img src="{{ book.cover_image.url }}" class="card-img-top book-cover-img" alt="{{ book.title }}">
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ book.title }}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
                         <p class="card-text">{{ book.description|truncatewords:30 }}</p>
-                        <div class="mb-2">
+                        <div class="mb-2 d-flex flex-wrap align-items-center gap-1">
                             {% for genre in book.genres.all %}
                                 <span class="badge bg-secondary me-1">{{ genre.name }}</span>
                             {% endfor %}
+                            {% if book.management %}
+                            {% if book.management.book_type == 'physical' %}
+                                <span class="badge bg-primary"><i class="fas fa-book"></i> Physical </span>
+                            {% elif book.management.book_type == 'electronic' %}
+                                <span class="badge bg-info"><i class="fas fa-tablet-alt"></i> Digital </span>
+                            {% endif %}
+                        {% endif %}
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">
@@ -77,7 +85,7 @@
                                     <i class="fas fa-eye"></i> View
                                 </a>
                                 {% if user.is_authenticated and book.available_copies > 0 %}
-                                    <a href="{% url 'borrowing:request_borrowing' book.pk %}" class="btn btn-sm btn-outline-success">
+                                    <a href="{% url 'borrow:borrow_physical' book.pk %}" class="btn btn-sm btn-outline-success">
                                         <i class="fas fa-book"></i> Borrow
                                     </a>
                                 {% endif %}
