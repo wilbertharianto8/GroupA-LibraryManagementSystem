@@ -1,0 +1,18 @@
+[
+{
+  "model": "books.genre",
+  "pk": 1,
+  "fields": {
+    "name": "Fantasy",
+    "description": "Not real"
+  }
+},
+{
+  "model": "books.genre",
+  "pk": 2,
+  "fields": {
+    "name": "Sports",
+    "description": "Active"
+  }
+}
+]
