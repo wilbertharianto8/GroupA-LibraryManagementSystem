@@ -4,12 +4,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from .models import Book, Genre
 from .forms import BookForm, GenreForm
 # from borrowing.models import Borrowing
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from book_management.models import BookManagement
+from django.db.models import Case, When, Value, CharField, BooleanField, IntegerField
+from django.db.models.functions import Concat
 
 class BookListView(ListView):
     model = Book
@@ -18,9 +21,13 @@ class BookListView(ListView):
     paginate_by = 12
     
     def get_queryset(self):
-        queryset = Book.objects.all()
         search_query = self.request.GET.get('search', '')
         genre_filter = self.request.GET.get('genre', '')
+
+        queryset = Book.objects.prefetch_related(
+            'genres',
+            Prefetch('management', queryset=BookManagement.objects.only('book_type'), to_attr='prefetched_management')
+        )
         
         if search_query:
             queryset = queryset.filter(
@@ -32,9 +39,9 @@ class BookListView(ListView):
         
         if genre_filter:
             queryset = queryset.filter(genres__id=genre_filter)
-        
-        return queryset
-    
+
+        return queryset.distinct()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['genres'] = Genre.objects.all()
@@ -55,6 +62,9 @@ class BookDetailView(DetailView):
         #         book=self.object
         #     ).order_by('-request_date')
         return context
+
+    def get_object(self, queryset=None):
+        return Book.objects.get(pk=self.kwargs['pk'])
 
 class BookCreateView(UserPassesTestMixin, CreateView):
 # class BookCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):

@@ -34,6 +34,16 @@
                                 <span class="badge bg-warning text-dark">Not yet returned</span>
                             {% endif %}
                         </li>
+                        <li class="list-group-item">
+                            <strong>Status:</strong>
+                            {% if borrow.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                            {% elif borrow.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Pending</span>
+                            {% endif %}
+                        </li>
                     </ul>
 
                     {% if borrow.book_type == 'digital' and borrow.due_date > now and not borrow.returned_at %}

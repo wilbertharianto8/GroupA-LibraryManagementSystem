@@ -4,6 +4,23 @@
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
+        <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-danger">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="messageModalLabel"><i class="bi bi-exclamation-triangle"></i> Notice</h5>
+                        <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-md-8 col-lg-6">
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-primary text-white text-center">
@@ -12,13 +29,13 @@
                 <div class="card-body">
                     <h4 class="card-title">{{ book.title }}</h4>
                     <p class="text-muted mb-1">Author: <strong>{{ book.author }}</strong></p>
-                    <p class="text-muted">ISBN: <strong>{{ book.isbn }}</strong></p>
+                    <p class="text-muted">Borrow period: <strong>15 days</strong></p>
 
                     <form method="post" class="mt-4">
                         {% csrf_token %}
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-success btn-lg">
-                                <i class="bi bi-cloud-arrow-down-fill me-1"></i> Confirm Borrow (14 Days)
+                                <i class="bi bi-cloud-arrow-down-fill me-1"></i> Confirm Borrow
                             </button>
                             <a href="{% url 'borrow:book_detail' book.id %}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-circle me-1"></i> Cancel
@@ -33,4 +50,21 @@
         </div>
     </div>
 </div>
+{% if messages %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var myModal = new bootstrap.Modal(document.getElementById('messageModal'));
+        myModal.show();
+
+        // Auto-close after 5 seconds (5000 ms)
+        setTimeout(function () {
+            var modalEl = document.getElementById('messageModal');
+            var modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }, 5000);
+    });
+</script>
+{% endif %}
 {% endblock %}
