@@ -57,4 +57,6 @@ urlpatterns =[
         ),
         name='password_change_done',
     ),
+    path('request_list/', views.borrow_request_list, name='request_list'),
+    path('request_list/<int:record_id>/<str:action>/', views.process_borrow_request, name='process_borrow_request'),
 ]

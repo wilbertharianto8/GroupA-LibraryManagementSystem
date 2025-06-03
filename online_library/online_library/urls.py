@@ -28,7 +28,7 @@ urlpatterns = [
     path('',views.home,name='home'),
     path('search/', views.search_books, name='search_books'),
     path('borrow/', include('borrow.urls'), name='borrow'),
-    path('history/', include('borrow_history.urls'), name='history'),
+    path('borrow_history/', include('borrow_history.urls'), name='borrow_history'),
 ]
 
 if settings.DEBUG:

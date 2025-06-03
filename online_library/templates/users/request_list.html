@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Pending Borrow Requests</h2>
+
+    {% if requests %}
+        <ul class="list-group">
+            {% for req in requests %}
+                <li id="request-{{ req.id }}" class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        Request ID: {{ req.id }}<br>
+                        User: <strong>{{ req.user.username }}</strong><br>
+                        Book: <strong>{{ req.book.title }}</strong><br>
+                        Type: {{ req.book_type|capfirst }}
+                    </div>
+                    <div>
+                        <form class="action-form d-inline" data-id="{{ req.id }}" data-action="approve">
+                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+                        <form class="action-form d-inline" data-id="{{ req.id }}" data-action="reject">
+                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="alert alert-info">No pending requests.</div>
+    {% endif %}
+</div>
+
+<script>
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+document.querySelectorAll('.action-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const recordId = this.dataset.id;
+        const action = this.dataset.action;
+
+        fetch(`/users/request_list/${recordId}/${action}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                document.getElementById(`request-${recordId}`).remove();
+
+                // Auto-refresh if no requests left
+                if (document.querySelectorAll('.list-group-item').length === 0) {
+                    location.reload();
+                }
+            } else {
+                alert("Failed to process request.");
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

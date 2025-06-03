@@ -4,5 +4,6 @@ from . import views
 app_name = 'borrow_history'
 
 urlpatterns = [
-    path('', views.dashboard, name='dashboard'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('download/<int:record_id>/', views.download_digital_book, name='download_digital_book'),
 ]
