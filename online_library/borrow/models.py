@@ -15,6 +15,7 @@ class BorrowRecord(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
         ('returned', 'Returned'),
+        ('overdue', 'Overdue')
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

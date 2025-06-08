@@ -22,3 +22,12 @@ def search_books(request):
         ).values('id', 'title', 'author', 'description')
         return JsonResponse(list(books), safe=False)
     return JsonResponse([], safe=False)
+
+def about(request):
+    return render(request, 'about.html')
+
+def contact(request):
+    return render(request, 'contact.html')
+
+def privacy(request):
+    return render(request, 'privacy.html')

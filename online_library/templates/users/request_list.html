@@ -15,9 +15,11 @@
                     </div>
                     <div>
                         <form class="action-form d-inline" data-id="{{ req.id }}" data-action="approve">
+                            {% csrf_token %}
                             <button type="submit" class="btn btn-success btn-sm">Approve</button>
                         </form>
                         <form class="action-form d-inline" data-id="{{ req.id }}" data-action="reject">
+                            {% csrf_token %}
                             <button type="submit" class="btn btn-danger btn-sm">Reject</button>
                         </form>
                     </div>
@@ -30,7 +32,7 @@
 </div>
 
 <script>
-const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
 document.querySelectorAll('.action-form').forEach(form => {
     form.addEventListener('submit', function(e) {

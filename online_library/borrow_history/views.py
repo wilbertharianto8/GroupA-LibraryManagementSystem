@@ -23,7 +23,11 @@ def dashboard(request):
         if status_filter == 'all':
             return records
         elif status_filter == 'overdue':
-            return records.filter(status='approved' and records.is_overdue)
+            return records.filter(
+                status='approved',
+                due_date__lt=now().date(),
+                returned_at__isnull=True
+            )
         else:
             return records.filter(status=status_filter)
 
