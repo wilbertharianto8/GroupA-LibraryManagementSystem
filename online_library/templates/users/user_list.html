@@ -1,27 +1,90 @@
 {% extends "base.html" %}
+{% block title %}User Management{% endblock %}
 
 {% block content %}
-<h2>Normal Users</h2>
-<ul>
-  {% for user in normal_users %}
-    <li>
-      {{ user.username }} - {{ user.email }}
-      <a href="{% url 'users:promote_user' user.id %}">Promote to Librarian</a>
-    </li>
-  {% empty %}
-    <li>No normal users found.</li>
-  {% endfor %}
-</ul>
+<div class="container my-5">
+  <form method="get" action="{% url 'users:user_list' %}" class="mb-4">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Search by username or ID" value="{{ query|default:'' }}">
+      <button class="btn btn-outline-primary" type="submit">Search</button>
+    </div>
+  </form>
 
-<h2>Librarians</h2>
-<ul>
-  {% for user in librarians %}
-    <li>
-      {{ user.username }} - {{ user.email }}
-      <a href="{% url 'users:demote_user' user.id %}">Demote to Normal User</a>
+  <!-- Tabs -->
+  <ul class="nav nav-tabs justify-content-flex-start" id="userTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="normal-tab" data-bs-toggle="tab" data-bs-target="#normal" type="button" role="tab" aria-controls="normal" aria-selected="true">
+        Normal Users
+      </button>
     </li>
-  {% empty %}
-    <li>No librarians found.</li>
-  {% endfor %}
-</ul>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="librarian-tab" data-bs-toggle="tab" data-bs-target="#librarian" type="button" role="tab" aria-controls="librarian" aria-selected="false">
+        Librarians
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-4" id="userTabContent">
+
+    <!-- Normal Users Tab -->
+    <div class="tab-pane fade show active" id="normal" role="tabpanel" aria-labelledby="normal-tab">
+      {% if normal_users %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+          {% for user in normal_users %}
+            <div class="col">
+              <div class="card shadow-sm border-0 h-100 transition-hover">
+                <div class="card-body d-flex align-items-center">
+                  <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random&size=64" alt="Avatar" class="rounded-circle me-3" width="64" height="64">
+                  <div class="flex-grow-1">
+                    <h5 class="card-title mb-1">{{ user.username }}</h5>
+                    <p class="text-muted mb-1">{{ user.email }}</p>
+                    <span class="badge bg-secondary">Normal User</span>
+                  </div>
+                  <a href="{% url 'users:promote_user' user.id %}" class="btn btn-outline-success btn-sm ms-2">Promote</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted text-center">No normal users found.</p>
+      {% endif %}
+    </div>
+
+    <!-- Librarians Tab -->
+    <div class="tab-pane fade" id="librarian" role="tabpanel" aria-labelledby="librarian-tab">
+      {% if librarians %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+          {% for user in librarians %}
+            <div class="col">
+              <div class="card shadow-sm border-0 h-100 transition-hover">
+                <div class="card-body d-flex align-items-center">
+                  <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random&size=64" alt="Avatar" class="rounded-circle me-3" width="64" height="64">
+                  <div class="flex-grow-1">
+                    <h5 class="card-title mb-1">{{ user.username }}</h5>
+                    <p class="text-muted mb-1">{{ user.email }}</p>
+                    <span class="badge bg-primary">Librarian</span>
+                  </div>
+                  <a href="{% url 'users:demote_user' user.id %}" class="btn btn-outline-danger btn-sm ms-2">Demote</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted text-center">No librarians found.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .transition-hover {
+    transition: transform 0.2s ease-in-out;
+  }
+  .transition-hover:hover {
+    transform: translateY(-5px);
+  }
+</style>
 {% endblock %}

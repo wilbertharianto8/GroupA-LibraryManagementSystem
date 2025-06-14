@@ -32,42 +32,49 @@
 }
 #search-input {
     font-size: 1rem;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 50px;
+    border: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     transition: box-shadow 0.3s ease;
 }
-
 #search-input:focus {
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.4);
 }
-
+.input-group-text {
+    background: none;
+    border: none;
+}
 .search-results {
     max-height: 300px;
-    background: #fff;
+    background: white;
     border-radius: 0.5rem;
     border: 1px solid #dee2e6;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     z-index: 1050;
     display: none;
     overflow-y: auto;
+    animation: fadeIn 0.3s ease-in-out;
 }
-
 .search-results.show {
     display: block;
 }
-
 .result-item {
     padding: 0.75rem 1rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
-
-.result-item:hover {
-    background-color: #f8f9fa;
+.search-results,
+.search-results .result-item {
+    background-color: #fff !important;
+    color: #212529 !important;
 }
-
+.result-item:hover {
+    background-color: #f1f3f5;
+}
 mark {
     background-color: #ffe066;
     color: #212529;
     font-weight: bold;
 }
-

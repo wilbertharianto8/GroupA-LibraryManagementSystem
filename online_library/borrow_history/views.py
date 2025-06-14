@@ -28,6 +28,12 @@ def dashboard(request):
                 due_date__lt=now().date(),
                 returned_at__isnull=True
             )
+        elif status_filter == 'approved':
+            return records.filter(
+                status='approved',
+                returned_at__isnull=True,
+                due_date__gte=now().date()
+            )
         else:
             return records.filter(status=status_filter)
 
@@ -36,8 +42,13 @@ def dashboard(request):
 
     def group_by_status(records):
         grouped = {}
+        today = now().date()
+
         for record in records:
-            key = record.status
+            if record.status == 'approved' and record.due_date and record.due_date < today and not record.returned_at:
+                key = 'overdue'
+            else:
+                key = record.status
             grouped.setdefault(key, []).append(record)
         return grouped
 
