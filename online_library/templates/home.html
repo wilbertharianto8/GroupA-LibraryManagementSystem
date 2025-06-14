@@ -197,3 +197,66 @@ document.addEventListener('click', function (e) {
 });
 </script>
 {% endblock %}
+
+<div class="container">
+    <!-- Hero Section with Search -->
+    <div class="row mb-5">
+        <div class="col-md-8 mx-auto text-center">
+            <h1 class="display-4 mb-4">📚 Welcome to Online Library</h1>
+            <p class="lead text-secondary">Discover and borrow book seamlessly.</p>
+        </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 position-relative">
+            <div class="input-group shadow-sm rounded-pill bg-white p-2">
+                <span class="input-group-text bg-white border-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" id="search-input" class="form-control border-0 rounded-end-pill" placeholder="Search for books by title" autocomplete="off">
+            </div>
+            <div id="search-results" class="search-results mt-2 position-absolute w-100"></div>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+
+        searchInput.addEventListener('input', function () {
+            const query = this.value;
+            if (query.length > 0) {
+                fetch(`/search/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResults.innerHTML = '';
+                        data.forEach(book => {
+                            const highlightedTitle = book.title.replace(
+                                new RegExp(query, 'gi'),
+                                match => `<mark>${match}</mark>`
+                            );
+                            const resultItem = document.createElement('div');
+                            resultItem.classList.add('result-item');
+                            resultItem.innerHTML = `<strong>${highlightedTitle}</strong> by ${book.author}`;
+                            resultItem.addEventListener('click', () => {
+                                window.location.href = `/books/${book.id}/`;
+                            });
+                            searchResults.appendChild(resultItem);
+                        });
+                        searchResults.classList.add('show');
+                    });
+            } else {
+                searchResults.innerHTML = '';
+                searchResults.classList.remove('show');
+            }
+        });
+        document.addEventListener('click', function (e) {
+            if (!searchResults.contains(e.target) && e.target !== searchInput) {
+                searchResults.classList.remove('show');
+            }
+        });
+    </script>
+</div>
+
+{% endblock %}

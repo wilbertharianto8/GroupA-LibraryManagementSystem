@@ -49,6 +49,8 @@ def dashboard(request):
                 key = 'overdue'
             else:
                 key = record.status
+        for record in records:
+            key = record.status
             grouped.setdefault(key, []).append(record)
         return grouped
 
@@ -66,7 +68,7 @@ def dashboard(request):
 
     return render(request, 'history/dashboard.html', context)
 
-# @login_required
+@login_required
 def download_digital_book(request, record_id):
     record = get_object_or_404(BorrowRecord, id=record_id, user=request.user)
 

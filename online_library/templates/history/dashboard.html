@@ -129,7 +129,61 @@
                 <p>No digital book borrow records found.</p>
             {% endfor %}
         </div>
+            {% empty %}
+                <p>No physical book borrow records found.</p>
+            {% endfor %}
+        </div>
 
+        <!-- Digital Books Tab -->
+        <div class="tab-pane fade {% if active_tab == 'digital' %}show active{% endif %}" id="digital" role="tabpanel" aria-labelledby="digital-tab">
+            <form method="get" class="mb-4">
+                <input type="hidden" name="tab" value="digital">
+                <div class="input-group">
+                    <label class="input-group-text" for="digitalStatusFilter">Filter by status</label>
+                    <select class="form-select" name="status" id="digitalStatusFilter" onchange="this.form.submit()">
+                        {% for option in digital_filter_options %}
+                            <option value="{{ option }}" {% if current_filter == option and active_tab == 'digital' %}selected{% endif %}>
+                                {{ option|capfirst }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+
+            {% for status, records in digital_history.items %}
+                {% if records %}
+                    <h4 class="mt-4 text-capitalize">{{ status }} Records</h4>
+                    <div class="list-group">
+                        {% for record in records %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ record.book.title }}</strong><br>
+                                    Borrowed on: {{ record.borrowed_at }}<br>
+                                    Download before: {{ record.due_date }}<br>
+                                    {% if status == 'overdue' %}
+                                        <span class="badge bg-danger">Expired</span>
+                                    {% else %}
+                                        <span class="badge bg-success">{{ record.status|capfirst }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div>
+                                    {% if record.status == 'approved' %}
+                                        <a href="{% url 'borrow_history:download_digital_book' record.id %}" class="btn btn-primary btn-sm">
+                                            Download
+                                        </a>
+                                    {% elif record.status == 'overdue' %}
+                                        <button class="btn btn-secondary btn-sm" disabled>Download Expired</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% empty %}
+                <p>No digital book borrow records found.</p>
+            {% endfor %}
+        </div>
     </div>
 </div>
 

@@ -60,6 +60,25 @@
 .search-results.show {
     display: block;
 }
+    padding: 0.75rem 1rem;
+    transition: box-shadow 0.3s ease;
+}
+#search-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+.search-results {
+    max-height: 300px;
+    background: #fff;
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    z-index: 1050;
+    display: none;
+    overflow-y: auto;
+}
+.search-results.show {
+    display: block;
+}
 .result-item {
     padding: 0.75rem 1rem;
     cursor: pointer;
@@ -72,6 +91,10 @@
 }
 .result-item:hover {
     background-color: #f1f3f5;
+}
+
+.result-item:hover {
+    background-color: #f8f9fa;
 }
 mark {
     background-color: #ffe066;
