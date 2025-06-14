@@ -5,7 +5,7 @@
 <div class="container my-5">
   <form method="get" action="{% url 'users:user_list' %}" class="mb-4">
     <div class="input-group">
-      <input type="text" name="q" class="form-control" placeholder="Search by username or ID" value="{{ query|default:'' }}">
+      <input type="text" name="q" class="form-control" placeholder="Search by username" value="{{ query|default:'' }}">
       <button class="btn btn-outline-primary" type="submit">Search</button>
     </div>
   </form>
