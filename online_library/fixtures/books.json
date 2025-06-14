@@ -1,0 +1,44 @@
+[
+{
+  "model": "books.book",
+  "pk": 1,
+  "fields": {
+    "title": "Harry Potter",
+    "author": "JK Rowling",
+    "description": "Wizard boy",
+    "isbn": "12345",
+    "publisher": "Book",
+    "publication_year": 2001,
+    "total_copies": 1,
+    "available_copies": 1,
+    "cover_image": "",
+    "is_featured": false,
+    "created_at": "2025-05-30T18:49:09.884Z",
+    "updated_at": "2025-05-30T18:49:09.884Z",
+    "genres": [
+      1
+    ]
+  }
+},
+{
+  "model": "books.book",
+  "pk": 2,
+  "fields": {
+    "title": "NBA",
+    "author": "EA",
+    "description": "2",
+    "isbn": "1",
+    "publisher": "Book studio",
+    "publication_year": 2025,
+    "total_copies": 1,
+    "available_copies": 1,
+    "cover_image": "",
+    "is_featured": false,
+    "created_at": "2025-05-31T03:11:33.162Z",
+    "updated_at": "2025-05-31T03:11:33.162Z",
+    "genres": [
+      2
+    ]
+  }
+}
+]
