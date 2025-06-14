@@ -25,10 +25,13 @@ urlpatterns = [
     path('users/', include('users.urls'), name='users'),
     path('book-management/', include('book_management.urls'), name='book_management'),
     path('books/', include('books.urls'), name='books'),
-    path('',views.home,name='home'),
     path('search/', views.search_books, name='search_books'),
     path('borrow/', include('borrow.urls'), name='borrow'),
-    path('history/', include('borrow_history.urls'), name='history'),
+    path('borrow_history/', include('borrow_history.urls'), name='borrow_history'),
+    path('aboutus/', views.about, name='about'),
+    path('contactus/', views.contact, name='contact'),
+    path('privacy/', views.privacy, name='privacy'),
+    path('',views.home,name='home'),
 ]
 
 if settings.DEBUG:

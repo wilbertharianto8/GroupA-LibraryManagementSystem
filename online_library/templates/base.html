@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Online Library{% endblock %}</title>
 
@@ -30,60 +31,56 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                          {% for group in user.groups.all %}
-                            {% if group.name == "Librarian" %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'book_management:book_list' %}">Book Management</a>
-                    </li>
-                    <li class="nav-item">
-                              <!-- Show librarian-only content here -->
-                              <a class="nav-link" href="{% url 'users:user_list' %}">Admin Dashboard</a>
-                    </li>
-                                {% endif %}
-                            {% endfor %}
-                    {% endif %}
-                </ul>
-                <!-- Dropdown for user auth -->
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item dropdown">
-              <!-- The logo or icon trigger -->
-              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                 data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user-circle fa-lg"></i> <!-- FontAwesome user icon -->
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
-                  <li><a class="dropdown-item" href="{% url 'users:profile' %}">Profile</a></li>
-                  <li>
-                    <form action="{% url 'users:logout' %}" method="post" style="display: inline;">
-                      {% csrf_token %}
-                      <button type="submit" class="dropdown-item">Logout</button>
-                    </form>
-                  </li>
-                {% else %}
-                  <li><a class="dropdown-item" href="{% url 'users:login' %}">Login</a></li>
-                  <li><a class="dropdown-item" href="{% url 'users:register' %}">Register</a></li>
+                  {% for group in user.groups.all %}
+                    {% if group.name == "Librarian" %}
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'book_management:book_list' %}">Book Management</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{% url 'borrow_history:dashboard' %}">Borrow History</a>
+                      </li>
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Admin Dashboard
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                          <li><a class="dropdown-item" href="{% url 'users:request_list' %}">📖 Manage Requests</a></li>
+                          <li><a class="dropdown-item" href="{% url 'users:user_list' %}">👥 Manage Users</a></li>
+                        </ul>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
                 {% endif %}
+
+                <!-- User auth dropdown as last item -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    {% if user.is_authenticated %}
+                      <li><a class="dropdown-item" href="{% url 'users:profile' %}">👤 Profile</a></li>
+                      <li>
+                        <form action="{% url 'users:logout' %}" method="post" style="display: inline;">
+                          {% csrf_token %}
+                          <button type="submit" class="dropdown-item">🚪 Logout</button>
+                        </form>
+                      </li>
+                    {% else %}
+                      <li><a class="dropdown-item" href="{% url 'users:login' %}">🔐 Login</a></li>
+                      <li><a class="dropdown-item" href="{% url 'users:register' %}">📝 Register</a></li>
+                    {% endif %}
+                  </ul>
+                </li>
               </ul>
-            </li>
-          </ul>
+            </div>
         </div>
-      </div>
     </nav>
     <!-- Main Content -->
     <main class="container py-4">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-        
         {% block content %}{% endblock %}
     </main>
 
@@ -91,16 +88,62 @@
     <footer class="bg-light py-4 mt-auto">
         <div class="container text-center">
             <div class="footer-links mb-2">
-                <a href="#">About Us</a>
-                <a href="#">Contact</a>
-                <a href="#">Privacy Policy</a>
+                <a href="{% url 'about' %}">About Us</a>
+                <a href="{% url 'contact' %}">Contact</a>
+                <a href="{% url 'privacy' %}">Privacy Policy</a>
             </div>
             <p class="mb-0">&copy; {% now "Y" %} Online Library. All rights reserved.</p>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        $(document).ready(function() {
+            $('.btn-process').click(function(e) {
+                e.preventDefault();
+                const button = $(this);
+                const recordId = button.data('id');
+                const action = button.data('action');
+
+                $.ajax({
+                    url: `/users/request_list/${recordId}/${action}/`,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Optionally remove the item or update UI
+                            button.closest('li').fadeOut();
+                        } else {
+                            alert(response.error || 'Failed to process request.');
+                        }
+                    },
+                    error: function() {
+                        alert('Something went wrong. Try again.');
+                    }
+                });
+            });
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html> 

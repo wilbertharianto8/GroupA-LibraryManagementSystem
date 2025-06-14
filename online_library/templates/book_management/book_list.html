@@ -36,7 +36,7 @@
                                 <td>
                                     {% with book.management.book_type|lower as bt %}
                                     <span class="badge
-                                        {% if bt == 'physical' %}bg-info
+                                        {% if bt == 'physical' %}bg-info text-dark
                                         {% elif bt == 'digital' %}bg-success
                                         {% else %}bg-secondary
                                         {% endif %}">
@@ -59,11 +59,11 @@
                                 </td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{% url 'book_management:edit_book' book.pk %}" 
+                                        <a href="{% url 'book_management:edit_book' book.pk %}"
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
-                                        <a href="{% url 'book_management:delete_book' book.pk %}" 
+                                        <a href="{% url 'book_management:delete_book' book.pk %}"
                                            class="btn btn-sm btn-outline-danger">
                                             <i class="fas fa-trash"></i> Delete
                                         </a>

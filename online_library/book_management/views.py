@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from books.models import Book
+from collections import defaultdict
 
 class BookListView(ListView):
 # class BookListView(LoginRequiredMixin, ListView):
@@ -20,6 +21,8 @@ class BookListView(ListView):
     
     def get_queryset(self):
         return Book.objects.filter(management__isnull=False).order_by('id')
+
+
 
 # @login_required
 def add_book(request):

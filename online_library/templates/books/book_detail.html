@@ -4,106 +4,126 @@
 
 {% block content %}
 <div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow mb-4">
+    <!-- Book Details Card -->
+    <div class="card shadow mb-4">
+        <div class="row no-gutters">
+            <!-- Book Cover -->
+            <div class="col-md-4">
                 {% if book.cover_image %}
-                    <img src="{{ book.cover_image.url }}" class="card-img-top" alt="{{ book.title }}">
+                    <img src="{{ book.cover_image.url }}" class="card-img-top h-100" alt="{{ book.title }}">
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
+                        <span>No cover available</span>
+                    </div>
                 {% endif %}
+            </div>
+
+            <!-- Book Info -->
+            <div class="col-md-8">
                 <div class="card-body">
-                    <h5 class="card-title">{{ book.title }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
-                    <p class="card-text">
-                        <strong>ISBN:</strong> {{ book.isbn }}<br>
-                        <strong>Publisher:</strong> {{ book.publisher }}<br>
-                        <strong>Publication Year:</strong> {{ book.publication_year }}<br>
-                        <strong>Total Copies:</strong> {{ book.total_copies }}<br>
-                        <strong>Available Copies:</strong> 
-                        {% if book.available_copies > 0 %}
-                            <span class="text-success">{{ book.available_copies }}</span>
-                        {% else %}
-                            <span class="text-danger">Out of stock</span>
-                        {% endif %}
-                    </p>
+                    <h3 class="card-title">{{ book.title }}</h3>
+                    <h6 class="card-subtitle mb-3 text-muted">{{ book.author }}</h6>
+
+                    <!-- Description -->
+                    {% if book.description %}
+                        <p class="card-text mb-4">{{ book.description }}</p>
+                    {% endif %}
+
+                    <!-- Metadata -->
+                    <ul class="list-unstyled mb-3">
+                        <li><strong>ISBN:</strong> {{ book.isbn }}</li>
+                        <li><strong>Publisher:</strong> {{ book.publisher }}</li>
+                        <li><strong>Publication Year:</strong> {{ book.publication_year }}</li>
+                        <li><strong>Total Copies:</strong> {{ book.total_copies }}</li>
+                        <li>
+                            <strong>Available Copies:</strong>
+                            {% if book.available_copies > 0 %}
+                                <span class="text-success">{{ book.available_copies }}</span>
+                            {% else %}
+                                <span class="text-danger">Out of stock</span>
+                            {% endif %}
+                        </li>
+                    </ul>
+
+                    <!-- Genres -->
                     <div class="mb-3">
                         {% for genre in book.genres.all %}
                             <span class="badge bg-secondary me-1">{{ genre.name }}</span>
+                        {% empty %}
+                            <small class="text-muted">No genres assigned.</small>
                         {% endfor %}
                     </div>
-                    {% comment %} {% if user.is_authenticated %}
+
+                    <!-- Borrow Button -->
+                    {% if user.is_authenticated %}
                         {% if book.available_copies > 0 %}
-                            <a href="{% url 'borrow:borrow_physical' book.pk %}" class="btn btn-primary w-100">
-                                <i class="fas fa-book"></i> Borrow This Book
+                            <a href="{% url 'borrow:book_detail' book.id %}" class="btn btn-primary">
+                                <i class="fas fa-book"></i> Borrow Now
                             </a>
                         {% else %}
-                            <button class="btn btn-secondary w-100" disabled>
-                                <i class="fas fa-times"></i> Not Available
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-exclamation-triangle"></i> Currently Unavailable
                             </button>
                         {% endif %}
                     {% else %}
-                        <a href="{% url 'accounts:login' %}?next={% url 'books:book_detail' book.pk %}" class="btn btn-primary w-100">
+                        <a href="{% url 'users:login' %}?next={% url 'books:book_detail' book.pk %}"
+                           class="btn btn-primary">
                             <i class="fas fa-sign-in-alt"></i> Login to Borrow
                         </a>
-                    {% endif %} {% endcomment %}
+                    {% endif %}
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-8">
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    <h4 class="card-title">Description</h4>
-                    <p class="card-text">{{ book.description }}</p>
-                </div>
-            </div>
-            
-            {% comment %} {% if user.is_authenticated and user_borrowings %}
-                <div class="card shadow">
-                    <div class="card-body">
-                        <h4 class="card-title">Your Borrowing History</h4>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Request Date</th>
-                                        <th>Due Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for borrowing in user_borrowings %}
-                                        <tr>
-                                            <td>
-                                                <span class="badge bg-{{ borrowing.status|lower }}">
-                                                    {{ borrowing.status|title }}
-                                                </span>
-                                            </td>
-                                            <td>{{ borrowing.request_date|date:"M d, Y" }}</td>
-                                            <td>
-                                                {% if borrowing.due_date %}
-                                                    {{ borrowing.due_date|date:"M d, Y" }}
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if borrowing.status == 'borrowed' %}
-                                                    <a href="{% url 'borrowing:return_book' borrowing.pk %}" 
-                                                       class="btn btn-sm btn-primary">
-                                                        <i class="fas fa-undo"></i> Return
-                                                    </a>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            {% endif %} {% endcomment %}
         </div>
     </div>
+
+    <!-- Optional: Borrowing History -->
+    {% comment %}
+    {% if user.is_authenticated and user_borrowings %}
+        <div class="card shadow">
+            <div class="card-body">
+                <h4 class="card-title">Your Borrowing History</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Request Date</th>
+                                <th>Due Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for borrowing in user_borrowings %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-{{ borrowing.status|lower }}">
+                                            {{ borrowing.status|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ borrowing.request_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if borrowing.due_date %}
+                                            {{ borrowing.due_date|date:"M d, Y" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if borrowing.status == 'borrowed' %}
+                                            <a href="{% url 'borrowing:return_book' borrowing.pk %}"
+                                               class="btn btn-sm btn-primary">
+                                                <i class="fas fa-undo"></i> Return
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% endcomment %}
 </div>
-{% endblock %} 
+{% endblock %}

@@ -1,43 +1,130 @@
 {% extends 'base.html' %}
-{% block title %}Borrowing History{% endblock %}
-
+{% block title %}Borrow History{% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4"><i class="bi bi-clock-history"></i> Borrowing History</h2>
+<div class="container">
+    <h2 class="mb-4">Borrow History</h2>
 
-    <table class="table table-striped table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Book</th>
-                <th>Type</th>
-                <th>Borrowed At</th>
-                <th>Due Date</th>
-                <th>Returned At</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in history %}
-                <tr>
-                    <td>{{ item.record.book.title }}</td>
-                    <td>{{ item.record.get_book_type_display }}</td>
-                    <td>{{ item.record.borrowed_at }}</td>
-                    <td>{{ item.record.due_date }}</td>
-                    <td>{{ item.record.returned_at|default:"—" }}</td>
-                    <td>
-                        {% if item.status == 'Returned' %}
-                            <span class="badge bg-success">Returned</span>
-                        {% elif item.status == 'Overdue' %}
-                            <span class="badge bg-danger">Overdue</span>
-                        {% else %}
-                            <span class="badge bg-warning text-dark">Active</span>
-                        {% endif %}
-                    </td>
-                </tr>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="borrowTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if active_tab == 'physical' %}active{% endif %}" id="physical-tab" data-bs-toggle="tab" href="#physical" role="tab" aria-controls="physical" aria-selected="{% if active_tab == 'physical' %}true{% else %}false{% endif %}">
+                Physical Books
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if active_tab == 'digital' %}active{% endif %}" id="digital-tab" data-bs-toggle="tab" href="#digital" role="tab" aria-controls="digital" aria-selected="{% if active_tab == 'digital' %}true{% else %}false{% endif %}">
+                Digital Books
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab contents -->
+    <div class="tab-content mt-3" id="borrowTabContent">
+        <!-- Physical Books Tab -->
+        <div class="tab-pane fade {% if active_tab == 'physical' %}show active{% endif %}" id="physical" role="tabpanel" aria-labelledby="physical-tab">
+            <form method="get" class="mb-4">
+                <input type="hidden" name="tab" value="physical">
+                <div class="input-group">
+                    <label class="input-group-text" for="physicalStatusFilter">Filter by status</label>
+                    <select class="form-select" name="status" id="physicalStatusFilter" onchange="this.form.submit()">
+                        {% for option in physical_filter_options %}
+                            <option value="{{ option }}" {% if current_filter == option and active_tab == 'physical' %}selected{% endif %}>
+                                {{ option|capfirst }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+
+            {% for status, records in physical_history.items %}
+                {% if records %}
+                    <h4 class="mt-4 text-capitalize">{{ status }} Records</h4>
+                    <div class="list-group">
+                        {% for record in records %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ record.book.title }}</strong> ({{ record.get_book_type_display }})<br>
+                                    Borrowed on: {{ record.borrowed_at }}<br>
+                                    Due by: {{ record.due_date }}
+                                </div>
+                                {% if record.status == 'returned' %}
+                                    Returned: {{ record.returned_at }}
+                                {% elif status == 'overdue' %}
+                                    <span class="badge bg-danger">Overdue</span>
+                                {% else %}
+                                    {% if record.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark text-capitalize">{{ record.status }}</span>
+                                    {% elif record.status == 'approved' %}
+                                        <span class="badge bg-success text-capitalize">{{ record.status }}</span>
+                                    {% elif record.status == 'rejected' %}
+                                        <span class="badge bg-danger text-capitalize">{{ record.status }}</span>
+                                    {% elif record.status == 'returned' %}
+                                        <span class="badge bg-secondary text-capitalize">{{ record.status }}</span>
+                                    {% else %}
+                                        <span class="badge bg-info text-capitalize">{{ record.status }}</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             {% empty %}
-                <tr><td colspan="6" class="text-center">No borrowing history found.</td></tr>
+                <p>No physical book borrow records found.</p>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
+
+        <!-- Digital Books Tab -->
+        <div class="tab-pane fade {% if active_tab == 'digital' %}show active{% endif %}" id="digital" role="tabpanel" aria-labelledby="digital-tab">
+            <form method="get" class="mb-4">
+                <input type="hidden" name="tab" value="digital">
+                <div class="input-group">
+                    <label class="input-group-text" for="digitalStatusFilter">Filter by status</label>
+                    <select class="form-select" name="status" id="digitalStatusFilter" onchange="this.form.submit()">
+                        {% for option in digital_filter_options %}
+                            <option value="{{ option }}" {% if current_filter == option and active_tab == 'digital' %}selected{% endif %}>
+                                {{ option|capfirst }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+
+            {% for status, records in digital_history.items %}
+                {% if records %}
+                    <h4 class="mt-4 text-capitalize">{{ status }} Records</h4>
+                    <div class="list-group">
+                        {% for record in records %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ record.book.title }}</strong><br>
+                                    Borrowed on: {{ record.borrowed_at }}<br>
+                                    Download before: {{ record.due_date }}<br>
+                                    {% if status == 'overdue' %}
+                                        <span class="badge bg-danger">Expired</span>
+                                    {% else %}
+                                        <span class="badge bg-success">{{ record.status|capfirst }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div>
+                                    {% if record.status == 'approved' %}
+                                        <a href="{% url 'borrow_history:download_digital_book' record.id %}" class="btn btn-primary btn-sm">
+                                            Download
+                                        </a>
+                                    {% elif record.status == 'overdue' %}
+                                        <button class="btn btn-secondary btn-sm" disabled>Download Expired</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% empty %}
+                <p>No digital book borrow records found.</p>
+            {% endfor %}
+        </div>
+
+    </div>
 </div>
+
 {% endblock %}
