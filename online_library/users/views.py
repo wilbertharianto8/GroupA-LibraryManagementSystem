@@ -10,7 +10,7 @@ from django.contrib.auth.models import User, Group
 from .forms import ProfileForm
 from borrow.models import BorrowRecord
 from django.views.decorators.http import require_POST
-
+from django.db.models import Q
 
 # Create your views here.
 class AddUserFormView(generic.TemplateView):
@@ -78,15 +78,26 @@ def promote_user(request, user_id):
 @login_required
 @user_passes_test(is_librarian)
 def user_list(request):
+    query = request.GET.get('q', '').strip()
+
     normal_group = Group.objects.get(name='NormalUser')
     librarian_group = Group.objects.get(name='Librarian')
 
     normal_users = User.objects.filter(groups=normal_group)
     librarians = User.objects.filter(groups=librarian_group)
 
+    if query:
+        normal_users = normal_users.filter(
+            Q(username__icontains=query)
+        )
+        librarians = librarians.filter(
+            Q(username__icontains=query)
+        )
+
     return render(request, 'users/user_list.html', {
         'normal_users': normal_users,
-        'librarians': librarians
+        'librarians': librarians,
+        'query': query,
     })
 
 @login_required

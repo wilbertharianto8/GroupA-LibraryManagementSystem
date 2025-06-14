@@ -34,6 +34,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
               <ul class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
+                  <li class="nav-item">
+                        <a class="nav-link" href="{% url 'borrow_history:dashboard' %}">Borrow History</a>
+                  </li>
                   {% for group in user.groups.all %}
                     {% if group.name == "Librarian" %}
                       <li class="nav-item">
@@ -80,6 +83,7 @@
         </div>
     </nav>
     <!-- Main Content -->
+    <main class="{% block main_class %}container py-4{% endblock %}">
     <main class="container py-4">
         {% block content %}{% endblock %}
     </main>

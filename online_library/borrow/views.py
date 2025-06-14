@@ -20,7 +20,10 @@ def borrow_physical(request, book_id):
 
     if book.available_copies <= 0:
         messages.error(request, 'No physical copies available for borrowing.')
-        return redirect('borrow:book_detail', book_id=book.id)
+        return render(request,'borrow/borrow_physical.html', {
+            'book': book,
+            'form': None
+        })
 
     if request.method == 'POST':
         existing = BorrowRecord.objects.filter(

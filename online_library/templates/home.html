@@ -2,8 +2,202 @@
 {% load static %}
 
 {% block title %}Home - Online Library{% endblock %}
-
+{% block main_class %}p-0 m-0 flex-grow-1{% endblock %}
 {% block content %}
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+}
+body {
+    display: flex;
+    flex-direction: column;
+}
+header {
+    flex-shrink: 0;
+}
+footer {
+    flex-shrink: 0;
+}
+main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.hero-section {
+    background-image: url("{% static 'images/bg-image.png' %}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    flex: 1 0 auto;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    animation: bgZoom 20s ease-in-out infinite alternate;
+}
+.hero-overlay {
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(3px);
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+}
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100%;
+}
+.book-cover-section {
+    overflow: hidden;
+    width: 100%;
+    background: rgba(255,255,255,0.1);
+    padding: 2rem 0;
+    margin-top: 10px;
+}
+.cover-track {
+    display: flex;
+    gap: 1rem;
+    animation: scroll-horizontal 30s linear infinite;
+}
+.cover-item {
+    flex: 0 0 auto;
+}
+.cover-item img {
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease-in-out;
+}
+.cover-item img:hover {
+    transform: scale(1.05);
+}
+@keyframes bgZoom {
+    from {
+        background-size: 100%;
+    }
+    to {
+        background-size: 110%;
+    }
+}
+@keyframes scroll-horizontal {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 576px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    .hero-content p {
+        font-size: 1rem;
+    }
+}
+</style>
+
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <h1 class="display-4 fw-bold mb-3">📚 Welcome to Online Library</h1>
+        <p class="lead mb-4">Discover and borrow books seamlessly — anytime, anywhere.</p>
+
+        <!-- Search -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-8 position-relative">
+                <div class="input-group bg-white shadow rounded-pill p-2">
+                    <span class="input-group-text">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" id="search-input" class="form-control border-0 rounded-end-pill" placeholder="Search for books by title or author" autocomplete="off">
+                </div>
+                <div id="search-results" class="search-results mt-2 position-absolute w-100 text-start"></div>
+            </div>
+        </div>
+
+        <a href="{% url 'books:book_list' %}" class="btn btn-warning btn-lg rounded-pill shadow w-auto px-4 py-2 mx-auto d-block text-center">Browse All Books</a>
+        <div class="book-cover-section">
+            <div class="cover-track">
+                {% for book in featured_books %}
+                    {% if book.cover_image %}
+                        <div class="cover-item">
+                            <a href="{% url 'books:book_detail' book.id %}">
+                                <img src="{{ book.cover_image.url }}" class="img-fluid rounded shadow-sm" alt="{{ book.title }}" style="height: 150px; object-fit: cover;">
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% for book in featured_books %}
+                        {% if book.cover_image %}
+                        <div class="cover-item">
+                            <a href="{% url 'books:book_detail' book.id %}">
+                                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}">
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+searchInput.addEventListener('input', function () {
+    const query = this.value;
+    if (query.length > 0) {
+        fetch(`/search/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                searchResults.innerHTML = '';
+                if (data.length === 0) {
+                    searchResults.innerHTML = '<div class="result-item">No results found.</div>';
+                } else {
+                    data.forEach(book => {
+                        const highlightedTitle = book.title.replace(
+                            new RegExp(query, 'gi'),
+                            match => `<mark>${match}</mark>`
+                        );
+                        const resultItem = document.createElement('div');
+                        resultItem.classList.add('result-item');
+                        resultItem.innerHTML = `<strong>${highlightedTitle}</strong> by ${book.author}`;
+                        resultItem.addEventListener('click', () => {
+                            window.location.href = `/books/${book.id}/`;
+                        });
+                        searchResults.appendChild(resultItem);
+                    });
+                }
+                searchResults.classList.add('show');
+            });
+    } else {
+        searchResults.innerHTML = '';
+        searchResults.classList.remove('show');
+    }
+});
+
+document.addEventListener('click', function (e) {
+    if (!searchResults.contains(e.target) && e.target !== searchInput) {
+        searchResults.classList.remove('show');
+    }
+});
+</script>
+{% endblock %}
+
 <div class="container">
     <!-- Hero Section with Search -->
     <div class="row mb-5">

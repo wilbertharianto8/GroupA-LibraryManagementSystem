@@ -28,6 +28,12 @@ def dashboard(request):
                 due_date__lt=now().date(),
                 returned_at__isnull=True
             )
+        elif status_filter == 'approved':
+            return records.filter(
+                status='approved',
+                returned_at__isnull=True,
+                due_date__gte=now().date()
+            )
         else:
             return records.filter(status=status_filter)
 
@@ -36,6 +42,13 @@ def dashboard(request):
 
     def group_by_status(records):
         grouped = {}
+        today = now().date()
+
+        for record in records:
+            if record.status == 'approved' and record.due_date and record.due_date < today and not record.returned_at:
+                key = 'overdue'
+            else:
+                key = record.status
         for record in records:
             key = record.status
             grouped.setdefault(key, []).append(record)
@@ -55,7 +68,7 @@ def dashboard(request):
 
     return render(request, 'history/dashboard.html', context)
 
-# @login_required
+@login_required
 def download_digital_book(request, record_id):
     record = get_object_or_404(BorrowRecord, id=record_id, user=request.user)
 
