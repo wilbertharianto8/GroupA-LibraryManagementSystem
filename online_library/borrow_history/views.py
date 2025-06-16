@@ -49,8 +49,6 @@ def dashboard(request):
                 key = 'overdue'
             else:
                 key = record.status
-        for record in records:
-            key = record.status
             grouped.setdefault(key, []).append(record)
         return grouped
 

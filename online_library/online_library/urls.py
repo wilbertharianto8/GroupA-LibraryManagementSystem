@@ -28,6 +28,7 @@ urlpatterns = [
     path('search/', views.search_books, name='search_books'),
     path('borrow/', include('borrow.urls'), name='borrow'),
     path('borrow_history/', include('borrow_history.urls'), name='borrow_history'),
+    path('return/', include('return.urls'), name='return'),
     path('aboutus/', views.about, name='about'),
     path('contactus/', views.contact, name='contact'),
     path('privacy/', views.privacy, name='privacy'),

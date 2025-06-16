@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Return Successful{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-body text-center">
+            <h2 class="card-title text-success mb-4">
+                <i class="bi bi-check-circle-fill"></i> Book Returned Successfully
+            </h2>
+
+            <p class="fs-5"><strong>{{ borrow.book.title }}</strong> has been returned.</p>
+
+            {% if late_fee > 0 %}
+                <p class="fs-5 text-danger">Late Fee: <strong>RM {{ late_fee }}</strong></p>
+            {% else %}
+                <p class="fs-5 text-muted">No late fee applied. Thank you!</p>
+            {% endif %}
+
+            <a href="{% url 'borrow_history:dashboard' %}" class="btn btn-primary mt-4">
+                <i class="bi bi-arrow-left-circle"></i> Back to Borrow History
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
