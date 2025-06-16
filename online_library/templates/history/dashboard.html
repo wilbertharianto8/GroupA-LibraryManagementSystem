@@ -38,32 +38,56 @@
 
             {% for status, records in physical_history.items %}
                 {% if records %}
-                    <h4 class="mt-4 text-capitalize">{{ status }} Records</h4>
+                    <h4 class="mt-4 text-capitalize">
+                        {% if status == 'overdue' %}
+                            Overdue Records
+                        {% else %}
+                            {{ status|capfirst }} Records
+                        {% endif %}
+                    </h4>
                     <div class="list-group">
                         {% for record in records %}
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>{{ record.book.title }}</strong> ({{ record.get_book_type_display }})<br>
-                                    Borrowed on: {{ record.borrowed_at }}<br>
-                                    Due by: {{ record.due_date }}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>{{ record.book.title }}</strong><br>
+                                        Borrowed on: {{ record.borrowed_at }}<br>
+                                        Due by: {{ record.due_date }}<br>
+                                        {% if record.status == 'returned' %}
+                                        Returned on: {{ record.returned_at }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex flex-column align-items-center justify-content-center text-center">
+                                        {% if record.status == 'returned' %}
+                                            <span class="badge bg-secondary text-capitalize mb-2">Returned</span>
+
+                                        {% elif record.status == 'rejected' %}
+                                            <span class="badge bg-danger text-capitalize">{{ record.status }}</span>
+
+                                        {% elif record.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark text-capitalize">{{ record.status }}</span>
+
+                                        {% elif status == 'approved' %}
+                                            <div class="d-flex flex-column align-items-end">
+                                                <span class="badge bg-success text-capitalize mb-2">{{ record.status }}</span>
+                                                <a href="{% url 'return:return' record.id %}" class="btn btn-outline-success btn-sm return-btn">
+                                                    <i class="bi bi-box-arrow-in-left me-1"></i> Return Book
+                                                </a>
+                                            </div>
+
+                                        {% elif status == 'overdue' %}
+                                            <div class="d-flex flex-column align-items-end">
+                                                <span class="badge bg-danger text-capitalize mb-2">Overdue</span>
+                                                <a href="{% url 'return:return' record.id %}" class="btn btn-outline-danger btn-sm return-btn">
+                                                    <i class="bi bi-box-arrow-in-left me-1"></i> Return Book
+                                                </a>
+                                            </div>
+
+                                        {% else %}
+                                            <span class="badge bg-info text-capitalize">{{ record.status }}</span>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                {% if record.status == 'returned' %}
-                                    Returned: {{ record.returned_at }}
-                                {% elif status == 'overdue' %}
-                                    <span class="badge bg-danger">Overdue</span>
-                                {% else %}
-                                    {% if record.status == 'pending' %}
-                                        <span class="badge bg-warning text-dark text-capitalize">{{ record.status }}</span>
-                                    {% elif record.status == 'approved' %}
-                                        <span class="badge bg-success text-capitalize">{{ record.status }}</span>
-                                    {% elif record.status == 'rejected' %}
-                                        <span class="badge bg-danger text-capitalize">{{ record.status }}</span>
-                                    {% elif record.status == 'returned' %}
-                                        <span class="badge bg-secondary text-capitalize">{{ record.status }}</span>
-                                    {% else %}
-                                        <span class="badge bg-info text-capitalize">{{ record.status }}</span>
-                                    {% endif %}
-                                {% endif %}
                             </div>
                         {% endfor %}
                     </div>
