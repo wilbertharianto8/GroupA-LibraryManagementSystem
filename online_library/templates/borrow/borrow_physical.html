@@ -4,6 +4,7 @@
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
+        {% if messages %}
         <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-danger">
@@ -21,6 +22,22 @@
                 </div>
             </div>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('messageModal'));
+                myModal.show();
+
+                // Auto-close after 5 seconds (5000 ms)
+                setTimeout(function () {
+                    var modalEl = document.getElementById('messageModal');
+                    var modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                }, 5000);
+            });
+        </script>
+        {% endif %}
         <div class="col-md-8 col-lg-6">
             <div class="card shadow border-0">
                 <div class="card-header bg-dark text-white text-center">
@@ -56,22 +73,4 @@
         </div>
     </div>
 </div>
-{% if messages %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var myModal = new bootstrap.Modal(document.getElementById('messageModal'));
-        myModal.show();
-
-        // Auto-close after 5 seconds (5000 ms)
-        setTimeout(function () {
-            var modalEl = document.getElementById('messageModal');
-            var modalInstance = bootstrap.Modal.getInstance(modalEl);
-            if (modalInstance) {
-                modalInstance.hide();
-            }
-        }, 5000);
-    });
-</script>
-{% endif %}
-
 {% endblock %}

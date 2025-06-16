@@ -32,5 +32,127 @@
     "groups": [],
     "user_permissions": []
   }
-}
+},
+  {
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$lrJsth8uCsrNwmHgTV8ZP5$6gh4VaOxltjKcMqCf/knZjx24xPbhv96Db1D8kTZiGY=",
+    "last_login": "2025-06-02T14:54:51.462Z",
+    "is_superuser": true,
+    "username": "wzhan0201",
+    "first_name": "",
+    "last_name": "",
+    "email": "24081813@siswa.um.edu.my",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-05-27T14:09:09Z",
+    "groups": [
+      [
+        "Librarian"
+      ]
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$athmXcMydGPCHSlzilHWXK$nJHmvKFqJ84tst3xnDltOR3taAq68qIPap2U9dnyKFc=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "testgroup",
+    "first_name": "normaluser",
+    "last_name": "group",
+    "email": "acc@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-05-29T03:15:26.870Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$nxdQObQ9ZGiRL8qgMDdC0V$dAdpLyX71H48CEDHSsR249TXxa/bsNKBl7Vb+RAt+yc=",
+    "last_login": "2025-05-30T02:48:52.625Z",
+    "is_superuser": false,
+    "username": "jaden",
+    "first_name": "Jaden",
+    "last_name": "Lu",
+    "email": "jaden@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-05-29T03:34:01.253Z",
+    "groups": [
+      [
+        "NormalUser"
+      ]
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$wUzYyOHoAR3ckZibwJwmj1$yzJ+GlL6LK7sVx0WhXagj8UAFPWwcEZ7sFb8VDHGeqM=",
+    "last_login": "2025-06-02T14:51:49.133Z",
+    "is_superuser": false,
+    "username": "testprofile",
+    "first_name": "profile",
+    "last_name": "testing",
+    "email": "profile@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-05-30T03:19:20.109Z",
+    "groups": [
+      [
+        "NormalUser"
+      ]
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$X9tbiXc831C5bf8REwQiSm$nbTjNyk2Yr5h37eF8Vci0BLNFINLK2o6+ss2JYVPCko=",
+    "last_login": "2025-05-30T09:05:09.107Z",
+    "is_superuser": false,
+    "username": "test2",
+    "first_name": "test",
+    "last_name": "2",
+    "email": "123@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-05-30T09:04:22.802Z",
+    "groups": [
+      [
+        "NormalUser"
+      ]
+    ],
+    "user_permissions": []
+  }
+},
+  {
+    "model": "auth.user",
+    "fields": {
+      "password": "pbkdf2_sha256$870000$metNiB1rdj9boKA2PboeLM$uCz+3yprPoGjB2p6myLbF0djJSvVQPW8HFw7mNBbtzs=",
+      "last_login": "2025-05-30T09:08:41.309Z",
+      "is_superuser": false,
+      "username": "wzhan",
+      "first_name": "wzhan",
+      "last_name": "hew",
+      "email": "123@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-05-30T09:08:36.595Z",
+      "groups": [
+        [
+          "Librarian"
+        ]
+      ],
+      "user_permissions": []
+    }
+  }
 ]
