@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container mt-4">
-    <h2>Pending Borrow Requests</h2>
+    <h2>Borrow & Return Requests</h2>
 
     {% if requests %}
         <ul class="list-group">
@@ -11,57 +11,123 @@
                         Request ID: {{ req.id }}<br>
                         User: <strong>{{ req.user.username }}</strong><br>
                         Book: <strong>{{ req.book.title }}</strong><br>
-                        Type: {{ req.book_type|capfirst }}
+                        Type: {{ req.book_type|capfirst }}<br>
+                        Status: <span class="badge bg-info text-capitalize">{{ req.status}}</span>
+                        {% if req.status == 'return_rejected' and req.return_rejection_reason %}
+                            <p class="text-danger mt-2 mb-0">Rejection Reason: {{ req.return_rejection_reason }}</p>
+                        {% endif %}
                     </div>
                     <div>
-                        <form class="action-form d-inline" data-id="{{ req.id }}" data-action="approve">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                        </form>
-                        <form class="action-form d-inline" data-id="{{ req.id }}" data-action="reject">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                        </form>
+                        {% if req.status == 'pending' %}
+                            <form class="action-form d-inline" data-id="{{ req.id }}" data-action="approve">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Approve Borrow</button>
+                            </form>
+                            <form class="action-form d-inline" data-id="{{ req.id }}" data-action="reject">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Reject Borrow</button>
+                            </form>
+                        {% elif req.status == 'return_requested' %}
+                            <form class="action-form d-inline" data-id="{{ req.id }}" data-action="approve_return">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Approve Return</button>
+                            </form>
+                            <button type="button" class="btn btn-danger btn-sm reject-return-btn" data-bs-toggle="modal" data-bs-target="#rejectModal" data-id="{{ req.id }}">
+                                Reject Return
+                            </button>
+                        {% endif %}
                     </div>
                 </li>
             {% endfor %}
         </ul>
     {% else %}
-        <div class="alert alert-info">No pending requests.</div>
+        <div class="alert alert-info">No pending borrow or return requests.</div>
     {% endif %}
 </div>
 
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectModalLabel">Reject Return Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="rejectReturnForm" class="action-form" data-action="reject_return">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <input type="hidden" name="record_id_for_modal" id="recordIdForModal">
+                    <div class="mb-3">
+                        <label for="rejectionReason" class="form-label">Reason for Rejection</label>
+                        <textarea class="form-control" id="rejectionReason" name="reason" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Submit Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
-const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-document.querySelectorAll('.action-form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-        const recordId = this.dataset.id;
-        const action = this.dataset.action;
+    document.querySelectorAll('form.action-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        fetch(`/users/request_list/${recordId}/${action}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest',
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                document.getElementById(`request-${recordId}`).remove();
+            const recordId = this.dataset.id || document.getElementById('recordIdForModal').value;
+            const action = this.dataset.action;
+            const formData = new FormData(this);
 
-                // Auto-refresh if no requests left
-                if (document.querySelectorAll('.list-group-item').length === 0) {
-                    location.reload();
+            fetch(`/users/request_list/${recordId}/${action}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('rejectModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    
+                    const requestElement = document.getElementById(`request-${data.record_id}`);
+                    if (requestElement) {
+                        requestElement.remove();
+                    }
+
+                    
+                    if (document.querySelectorAll('.list-group-item').length === 0) {
+                        location.reload();
+                    } else {
+                        console.log("Request processed successfully.");
+                    }
+                } else {
+                    alert("Failed to process request: " + (data.error || "Unknown error."));
                 }
-            } else {
-                alert("Failed to process request.");
-            }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred while processing the request.");
+            });
         });
     });
-});
+
+    document.querySelectorAll('.reject-return-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const recordId = this.dataset.id;
+            document.getElementById('recordIdForModal').value = recordId;
+            document.getElementById('rejectionReason').value = '';
+        });
+    });
+
 </script>
 
 {% endblock %}

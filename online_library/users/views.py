@@ -11,6 +11,9 @@ from .forms import ProfileForm
 from borrow.models import BorrowRecord
 from django.views.decorators.http import require_POST
 from django.db.models import Q
+from django.db import transaction
+from datetime import timedelta
+from django.utils.timezone import now
 
 # Create your views here.
 class AddUserFormView(generic.TemplateView):
@@ -118,24 +121,66 @@ def demote_user(request, user_id):
 @login_required
 @user_passes_test(is_librarian)
 def borrow_request_list(request):
-    records = BorrowRecord.objects.filter(status='pending').order_by('-borrowed_at')
+    records = BorrowRecord.objects.filter(
+        Q(status='pending') | Q(status='return_requested')
+    ).order_by('-borrowed_at')
     return render(request, 'users/request_list.html', {'requests': records})
 
+@login_required
+@user_passes_test(is_librarian)
 @require_POST
 def process_borrow_request(request, record_id, action):
     try:
-        record = get_object_or_404(BorrowRecord, id=record_id, status='pending')
-    except BorrowRecord.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Record not found'}, status=404)
+        record = get_object_or_404(BorrowRecord, id=record_id)
+        
+        if record.status not in ['pending', 'return_requested']:
+            return JsonResponse({'success': False, 'error': 'Request not in a processable state.'}, status=400)
 
-    if action == 'approve':
-        record.status = 'approved'
-        if record.book_type == 'physical':
-            record.book.available_copies -= 1
-            record.book.save()
-    elif action == 'reject':
-        record.status = 'rejected'
-    else:
-        return JsonResponse({'error': 'Invalid action'}, status=400)
-    record.save()
-    return JsonResponse({'success': True})
+        with transaction.atomic():
+            if record.status == 'pending':
+                if action == 'approve':
+                    record.status = 'approved'
+                    if record.book_type == 'physical':
+                        if record.book.available_copies <= 0:
+                            raise ValueError("No available copies for this book.")
+                        record.book.available_copies -= 1
+                        record.book.save()
+                elif action == 'reject':
+                    record.status = 'rejected'
+                else:
+                    return JsonResponse({'error': 'Invalid action for pending request.'}, status=400)
+
+            elif record.status == 'return_requested':
+                if action == 'approve_return':
+                    record.status = 'returned'
+                    record.returned_at = now().date()
+
+                    late_fee_per_day = 1.00
+                    if record.returned_at > record.due_date:
+                        days_late = (record.returned_at - record.due_date).days
+                        late_fee = days_late * late_fee_per_day
+                    else:
+                        late_fee = 0.0
+                    record.return_rejection_reason = None
+
+                    if record.book_type == 'physical':
+                        record.book.available_copies = min(record.book.available_copies + 1, record.book.total_copies)
+                        record.book.save()
+
+                elif action == 'reject_return':
+                    record.status = 'return_rejected'
+                    rejection_reason = request.POST.get('reason', '').strip()
+                    if not rejection_reason:
+                        return JsonResponse({'success': False, 'error': 'Rejection reason is required.'}, status=400)
+                    record.return_rejection_reason = rejection_reason
+                else:
+                    return JsonResponse({'error': 'Invalid action for return request.'}, status=400)
+            
+            record.save()
+            return JsonResponse({'success': True, 'record_id': record.id})
+
+    except ValueError as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    except Exception as e:
+        print(f"Error processing borrow request: {e}")
+        return JsonResponse({'success': False, 'error': 'An unexpected error occurred.'}, status=500)

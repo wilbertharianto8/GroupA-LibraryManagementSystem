@@ -3,40 +3,26 @@ from django.utils.timezone import now
 from borrow.models import BorrowRecord
 from books.models import Book
 from datetime import timedelta
+from django.contrib import messages
 
 # Create your views here.
 
 LATE_FEE_PER_DAY = 1.00
 
 def return_book(request, record_id):
-    borrow = get_object_or_404(BorrowRecord, id=record_id)
+    borrow_record = get_object_or_404(BorrowRecord, id=record_id, user=request.user)
+
+    if borrow_record.book_type != 'physical' or \
+       borrow_record.status not in ['approved', 'overdue', 'return_rejected']:
+        messages.error(request, "This book cannot be returned at this time or is not a physical book.")
+        return redirect('borrow_history:dashboard')
 
     if request.method == 'POST':
-        today = now().date()
-        borrow.returned_at = today
+        borrow_record.status = 'return_requested'
+        borrow_record.save()
+        messages.success(request, f"Return request for '{borrow_record.book.title}' has been submitted for librarian review.")
+        return redirect('borrow_history:dashboard')
 
-        borrow.status = 'returned'
-
-        if today > borrow.due_date:
-            days_late = (today - borrow.due_date).days
-            late_fee = days_late * LATE_FEE_PER_DAY
-        else:
-            late_fee = 0.0
-
-        if borrow.book_type == 'physical':
-            try:
-                book = borrow.book
-                book.available_copies = min(book.available_copies + 1, book.total_copies)
-                book.save()
-            except (Book.DoesNotExist, ValueError):
-                print(f"[ERROR] Could not find book with ID {borrow.book} to update stock.")
-
-        borrow.save()
-
-        return render(request, 'return/return_success.html', {
-            'borrow': borrow,
-            'late_fee': late_fee,
-        })
     return render(request, 'return/return_confirm.html', {
-        'borrow': borrow,
+        'borrow': borrow_record,
     })
