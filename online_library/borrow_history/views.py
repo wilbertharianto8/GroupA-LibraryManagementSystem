@@ -13,7 +13,7 @@ def dashboard(request):
     active_tab = request.GET.get('tab', 'physical')
     current_filter = request.GET.get('status', 'all')
 
-    physical_filter_options = ['all', 'pending', 'approved', 'rejected', 'returned', 'overdue']
+    physical_filter_options = ['all', 'pending', 'approved', 'rejected', 'returned', 'overdue', 'return_requested', 'return_rejected']
     digital_filter_options = ['all', 'approved', 'overdue']
 
     physical_records = BorrowRecord.objects.filter(user=user, book_type='physical').order_by('-borrowed_at')
@@ -34,11 +34,16 @@ def dashboard(request):
                 returned_at__isnull=True,
                 due_date__gte=now().date()
             )
+        elif status_filter == 'return_requested':
+            return records.filter(status='return_requested')
+        elif status_filter == 'return_rejected':
+            return records.filter(status='return_rejected')
         else:
             return records.filter(status=status_filter)
 
     physical_filtered = filter_records(physical_records, current_filter if active_tab == 'physical' else 'all')
     digital_filtered = filter_records(digital_records, current_filter if active_tab == 'digital' else 'all')
+
 
     def group_by_status(records):
         grouped = {}
