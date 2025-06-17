@@ -15,7 +15,9 @@ class BorrowRecord(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
         ('returned', 'Returned'),
-        ('overdue', 'Overdue')
+        ('overdue', 'Overdue'),
+        ('return_requested', 'Return Requested'),
+        ('return_rejected', 'Return Rejected'),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -25,7 +27,8 @@ class BorrowRecord(models.Model):
     due_date = models.DateField()
     returned_at = models.DateField(null=True, blank=True)
     request_id = models.CharField(max_length=20, unique=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    return_rejection_reason = models.TextField(blank=True, null=True)
 
     def is_overdue(self):
         return self.due_date < now().date() and self.status == 'approved'
