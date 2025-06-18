@@ -152,12 +152,10 @@
                                 </div>
 
                                 <div>
-                                    {% if record.status == 'approved' %}
+                                    {% if record.status == 'approved' and status != 'overdue' %}
                                         <a href="{% url 'borrow_history:download_digital_book' record.id %}" class="btn btn-primary btn-sm">
                                             Download
                                         </a>
-                                    {% elif record.status == 'overdue' %}
-                                        <button class="btn btn-secondary btn-sm" disabled>Download Expired</button>
                                     {% endif %}
                                 </div>
                             </div>
