@@ -24,7 +24,7 @@ class BookListView(ListView):
 
 
 
-# @login_required
+@login_required
 def add_book(request):
     if request.method == 'POST':
         form = CombinedBookForm(request.POST, request.FILES)
@@ -40,7 +40,7 @@ def add_book(request):
         'title': 'Add Book'
     })
 
-# @login_required
+@login_required
 def edit_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     management = get_object_or_404(BookManagement, book=book)
