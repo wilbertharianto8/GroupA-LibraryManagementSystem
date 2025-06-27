@@ -38,7 +38,21 @@ class CombinedBookForm:
         
     def save(self):
         book = self.book_form.save()
-        management = self.management_form.save(commit=False)
-        management.book = book
-        management.save()
-        return book 
+        # Get or create the management record
+        management, created = BookManagement.objects.get_or_create(
+            book=book,
+            defaults={
+                'book_type': self.management_form.cleaned_data['book_type'],
+                'file': self.management_form.cleaned_data.get('file'),
+                'location_code': self.management_form.cleaned_data.get('location_code')
+            }
+        )
+        # If the record already existed, update it
+        if not created:
+            management.book_type = self.management_form.cleaned_data['book_type']
+            if 'file' in self.management_form.cleaned_data:
+                management.file = self.management_form.cleaned_data['file']
+            if 'location_code' in self.management_form.cleaned_data:
+                management.location_code = self.management_form.cleaned_data['location_code']
+            management.save()
+        return book
