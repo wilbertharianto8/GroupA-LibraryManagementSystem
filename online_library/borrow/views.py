@@ -14,7 +14,7 @@ from .models import BorrowRecord
 
 # Create your views here.
 
-# @login_required
+@login_required
 def borrow_physical(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 
@@ -62,7 +62,7 @@ def borrow_physical(request, book_id):
         'form': form
     })
 
-# @login_required
+@login_required
 def borrow_digital(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 
@@ -89,22 +89,24 @@ def borrow_digital(request, book_id):
         return render(request, 'borrow/borrow_digital.html', {'book': book})
     return render(request, 'borrow/borrow_digital.html', {'book': book})
 
-# @login_required
+@login_required
 def borrow_detail(request, record_id):
     borrow = get_object_or_404(BorrowRecord, id=record_id, user=request.user)
     return render(request, 'borrow/borrow_detail.html', {'borrow': borrow, 'now': now()})
 
-# @login_required
+@login_required
 def download_digital_book(request, record_id):
     record = get_object_or_404(BorrowRecord, id=record_id, user=request.user)
 
-    if record.book_type != 'electronic' or record.status != 'approved':
+    if (record.book_type != 'electronic' or
+            record.status != 'approved' or
+            record.due_date < now().date()):
         raise Http404("You do not have permission to download this book.")
 
     try:
         management = BookManagement.objects.get(book=record.book, book_type='electronic')
     except BookManagement.DoesNotExist:
-        raise Http404("Digital version not available.")
+        messages.error(request, "Digital version of this book is not available.")
 
     if not management.file:
         raise Http404("Digital file is missing.")
